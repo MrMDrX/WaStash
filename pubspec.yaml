@@ -20,3 +20,28 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+
+  fonts:
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/geist/Geist-Bold.otf
+          weight: 700
+        - asset: assets/fonts/geist/Geist-SemiBold.otf
+          weight: 600
+    - family: GeistMono
+      fonts:
+        - asset: assets/fonts/geist/GeistMono-Regular.otf
+          weight: 400
+
+    - family: Rubik
+      fonts:
+        - asset: assets/fonts/rubik/Rubik-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/rubik/Rubik-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/rubik/Rubik-Regular.ttf
+          weight: 400
