@@ -5,8 +5,8 @@ import 'package:wastash/constants/app_constants.dart';
 import 'package:wastash/cubits/language_cubit.dart';
 import 'package:wastash/cubits/theme_cubit.dart';
 import 'package:wastash/l10n/generated/app_localizations.dart';
+import 'package:wastash/pages/onboarding_page.dart';
 import 'package:wastash/themes/app_theme.dart';
-import 'package:wastash/utils/extensions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
                 localizationsDelegates: AppLocalizations.localizationsDelegates,
                 supportedLocales: AppLocalizations.supportedLocales,
                 debugShowCheckedModeBanner: false,
-                home: Scaffold(body: Center(child: Text(context.l10n.welcome))),
+                home: OnboardingPage(),
               );
             },
           );
