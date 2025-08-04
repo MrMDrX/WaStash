@@ -139,6 +139,43 @@ class _FullScreenViewerState extends State<FullScreenViewer>
     }
   }
 
+  Future<void> _deleteStatus() async {
+    try {
+      final uri = Uri.parse(widget.uri);
+
+      if (uri.scheme != 'file') {
+        debugPrint('Invalid URI scheme: ${uri.scheme}');
+        return;
+      }
+
+      final file = File.fromUri(uri);
+      debugPrint(widget.uri);
+      if (await file.exists()) {
+        await file.delete();
+
+        if (!mounted) return;
+
+        Navigator.of(context).pop();
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.fileDeleted)));
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(context.l10n.fileNotFound)));
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${context.l10n.errorDeleting}: $e')),
+        );
+      }
+    }
+  }
+
   Future<void> _shareFile() async {
     try {
       final tempDir = await getTemporaryDirectory();
@@ -298,21 +335,92 @@ class _FullScreenViewerState extends State<FullScreenViewer>
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    ActionButton(
-                                      icon: SvgPicture.asset(
-                                        AppAssets.saveIcon,
-                                        width: 24,
-                                        height: 24,
-                                        colorFilter: ColorFilter.mode(
-                                          context.brightness == Brightness.dark
-                                              ? Colors.white
-                                              : Colors.grey[800]!,
-                                          BlendMode.srcIn,
-                                        ),
-                                      ),
-                                      label: context.l10n.save,
-                                      onPressed: _saveToDownloads,
-                                    ),
+                                    widget.fromSavedStatus
+                                        ? ActionButton(
+                                            icon: SvgPicture.asset(
+                                              AppAssets.deleteIcon,
+                                              width: 24,
+                                              height: 24,
+                                              colorFilter: ColorFilter.mode(
+                                                context.brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                    : Colors.grey[800]!,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                            label: context.l10n.delete,
+                                            onPressed: () async {
+                                              final confirm =
+                                                  await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (context) =>
+                                                        AlertDialog(
+                                                          title: Text(
+                                                            context
+                                                                .l10n
+                                                                .deleteStatus,
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  context
+                                                                      .isArabic
+                                                                  ? 'Rubik'
+                                                                  : 'Geist',
+                                                            ),
+                                                          ),
+                                                          content: Text(
+                                                            context
+                                                                .l10n
+                                                                .deleteStatusMessage,
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () =>
+                                                                  Navigator.of(
+                                                                    context,
+                                                                  ).pop(false),
+                                                              child: Text(
+                                                                context
+                                                                    .l10n
+                                                                    .cancel,
+                                                              ),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () =>
+                                                                  Navigator.of(
+                                                                    context,
+                                                                  ).pop(true),
+                                                              child: Text(
+                                                                context
+                                                                    .l10n
+                                                                    .delete,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                  );
+
+                                              if (confirm == true) {
+                                                await _deleteStatus();
+                                              }
+                                            },
+                                          )
+                                        : ActionButton(
+                                            icon: SvgPicture.asset(
+                                              AppAssets.saveIcon,
+                                              width: 24,
+                                              height: 24,
+                                              colorFilter: ColorFilter.mode(
+                                                context.brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white
+                                                    : Colors.grey[800]!,
+                                                BlendMode.srcIn,
+                                              ),
+                                            ),
+                                            label: context.l10n.save,
+                                            onPressed: _saveToDownloads,
+                                          ),
                                     const SizedBox(width: 16),
                                     ActionButton(
                                       icon: SvgPicture.asset(
