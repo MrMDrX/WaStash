@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:wastash/constants/app_constants.dart';
 import 'package:wastash/cubits/language_cubit.dart';
+import 'package:wastash/cubits/theme_cubit.dart';
 import 'package:wastash/l10n/generated/app_localizations.dart';
+import 'package:wastash/themes/app_theme.dart';
 import 'package:wastash/utils/extensions.dart';
 
 void main() async {
@@ -18,16 +21,24 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => LanguageCubit(), lazy: false),
+        BlocProvider(create: (context) => ThemeCubit()),
       ],
       child: BlocBuilder<LanguageCubit, Locale>(
         builder: (context, locale) {
-          return MaterialApp(
-            title: 'WaStash',
-            locale: locale,
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            debugShowCheckedModeBanner: false,
-            home: Scaffold(body: Center(child: Text(context.l10n.welcome))),
+          return BlocBuilder<ThemeCubit, ThemeMode>(
+            builder: (context, themeMode) {
+              return MaterialApp(
+                title: AppConstants.appName,
+                theme: AppTheme.light(isArabic: locale.languageCode == 'ar'),
+                darkTheme: AppTheme.dark(isArabic: locale.languageCode == 'ar'),
+                themeMode: themeMode,
+                locale: locale,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                debugShowCheckedModeBanner: false,
+                home: Scaffold(body: Center(child: Text(context.l10n.welcome))),
+              );
+            },
           );
         },
       ),
