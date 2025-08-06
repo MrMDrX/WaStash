@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:wastash/cubits/bottom_nav_cubit.dart';
+import 'package:wastash/pages/saved_status_page.dart';
 import 'package:wastash/pages/status_page.dart';
 import 'package:wastash/widgets/bottom_nav.dart';
 import 'package:wastash/widgets/page_transition.dart';
@@ -15,7 +16,7 @@ class HomeNavigator extends StatelessWidget {
       builder: (context, currentIndex) {
         final pages = [
           const StatusPage(),
-          Scaffold(body: const Center(child: Text('Saved Page'))),
+          const SavedStatusPage(),
           Scaffold(body: const Center(child: Text('Settings Page'))),
         ];
 

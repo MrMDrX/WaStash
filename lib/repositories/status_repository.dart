@@ -39,6 +39,16 @@ class StatusRepository {
     return prefs.getString(_statusesUriKey);
   }
 
+  static Future<List<String>> getSavedStatusFiles() async {
+    try {
+      final files = await _channel.invokeMethod<List>('getSavedStatusFiles');
+      return files?.map((e) => e.toString()).toList() ?? [];
+    } catch (e) {
+      if (kDebugMode) print('Error getting saved status files: $e');
+      return [];
+    }
+  }
+
   static Future<void> saveStatusFolderUri(String uri) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_statusesUriKey, uri);
@@ -74,6 +84,13 @@ class StatusRepository {
   static Stream<List<String>> watchStatusFiles() async* {
     while (true) {
       yield await getStatusFiles();
+      await Future.delayed(const Duration(seconds: 5));
+    }
+  }
+
+  static Stream<List<String>> watchSavedStatusFiles() async* {
+    while (true) {
+      yield await getSavedStatusFiles();
       await Future.delayed(const Duration(seconds: 5));
     }
   }

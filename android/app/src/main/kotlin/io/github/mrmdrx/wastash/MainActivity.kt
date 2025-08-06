@@ -84,6 +84,9 @@ class MainActivity: FlutterActivity() {
                 "saveFile" -> {
                     saveFile(call, result)
                 }
+                "getSavedStatusFiles" -> {
+                    getSavedStatusFiles(result)
+                }
                 else -> result.notImplemented()
             }
         }
@@ -235,4 +238,22 @@ class MainActivity: FlutterActivity() {
         }
     }
 
+    private fun getSavedStatusFiles(result: MethodChannel.Result) {
+        try {
+            val savedDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "WaStash")
+            val files = mutableListOf<String>()
+
+            if (savedDir.exists() && savedDir.isDirectory) {
+                savedDir.listFiles()?.forEach { file ->
+                    if (file.isFile && isValidMediaFile(file.name)) {
+                        files.add(Uri.fromFile(file).toString())
+                    }
+                }
+            }
+
+            result.success(files)
+        } catch (e: Exception) {
+        result.error("SAVED_STATUS_ERROR", e.message, null)
+        }
+    }
 }

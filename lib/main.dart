@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wastash/constants/app_constants.dart';
 import 'package:wastash/cubits/bottom_nav_cubit.dart';
 import 'package:wastash/cubits/language_cubit.dart';
+import 'package:wastash/cubits/saved_status_cubit.dart';
 import 'package:wastash/cubits/status_cubit.dart';
 import 'package:wastash/cubits/theme_cubit.dart';
 import 'package:wastash/l10n/generated/app_localizations.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => ThemeCubit()),
         BlocProvider(create: (context) => BottomNavCubit()),
         BlocProvider(create: (context) => StatusCubit()),
+        BlocProvider(create: (context) => SavedStatusCubit()),
       ],
       child: BlocBuilder<LanguageCubit, Locale>(
         builder: (context, locale) {
