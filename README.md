@@ -17,6 +17,16 @@ WaStash is a lightweight, fast, and user-friendly WhatsApp Status Saver app buil
 - 🌗 Supports light and dark themes
 - 🌍 Multiple languages
 
+## 📸 Screenshots
+
+| **OnBoarding**                                       | **Status Images**                           | **Status Videos**                                 | **Important instructions**                                   |
+| ---------------------------------------------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| ![OnBoarding](docs/screenshots/onboarding-light.png) | ![Status Dark](docs/screenshots/status.png) | ![Status Videos](docs/screenshots/videos-tab.png) | ![Important instructions](docs/screenshots/instructions.png) |
+
+| **Status Preview**                           | **Saved Status**                                  | **Settings**                                 | **Languages**                                      |
+| -------------------------------------------- | ------------------------------------------------- | -------------------------------------------- | -------------------------------------------------- |
+| ![Status Preview](docs/screenshots/view.png) | ![Saved Status](docs/screenshots/saved-light.png) | ![Settings](docs/screenshots/settings.png) | ![Languages](docs/screenshots/languages-light.png) |
+
 ## 🚀 Getting Started
 
 ### ✅ Prerequisites
