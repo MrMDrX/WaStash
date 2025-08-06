@@ -1,0 +1,92 @@
+name: Build & Release WaStash for Android
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Version tag (eg. v1.2.3)"
+        required: false
+  release:
+    types: [created]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Determine version
+        id: get_version
+        run: |
+          if [ "${{ github.event.inputs.tag }}" != "" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          elif [ "${{ github.event.release.tag_name }}" != "" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF##*/}"
+          else
+            VERSION="0.0.0-dev"
+          fi
+
+          VERSION="${VERSION#v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build APKs (split + universal)
+        run: |
+          flutter build apk --split-per-abi --release
+          flutter build apk --release
+
+      - name: Rename APKs using version tag
+        run: |
+          mkdir release-apks
+          mv build/app/outputs/flutter-apk/app-arm64-v8a-release.apk release-apks/WaStash-arm64-v8a-v$VERSION.apk
+          mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk release-apks/WaStash-armeabi-v7a-v$VERSION.apk
+          mv build/app/outputs/flutter-apk/app-x86_64-release.apk release-apks/WaStash-x86_64-v$VERSION.apk
+          mv build/app/outputs/flutter-apk/app-release.apk release-apks/WaStash-universal-v$VERSION.apk
+
+      - name: Fetch all tags
+        run: git fetch --tags --force
+
+      - name: Generate changelog from commits
+        id: changelog
+        run: |
+          PREV_TAG=$(git tag --sort=-creatordate --merged HEAD | grep '^v' | grep -v "^v${VERSION}" | head -n 1)
+          if [ -n "$PREV_TAG" ]; then
+            echo "Using previous tag: $PREV_TAG"
+            CHANGELOG=$(git log --pretty=format:"- %s" $PREV_TAG..HEAD)
+          else
+            CHANGELOG="- Initial release"
+          fi
+
+          # Escape multiline for GitHub output
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+
+          echo "CHANGELOG=$CHANGELOG" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release with APKs & changelog
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ steps.get_version.outputs.VERSION }}
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          files: release-apks/*.apk
+          body: ${{ steps.changelog.outputs.CHANGELOG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
